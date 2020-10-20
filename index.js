@@ -89,6 +89,7 @@ async function execute(message, serverQueue) {
 }
 
 function skip(message, serverQueue) {
+  console.log("Skipping")
   if (!message.member.voice.channel)
     return message.channel.send(
       "You have to be in a voice channel to stop the music!"
@@ -98,7 +99,10 @@ function skip(message, serverQueue) {
   serverQueue.connection.dispatcher.end();
 }
 
+
+// Stop command just disconnects the bot
 function stop(message, serverQueue) {
+  console.log("Stopping")
   if (!message.member.voice.channel)
     return message.channel.send(
       "You have to be in a voice channel to stop the music!"
@@ -108,8 +112,10 @@ function stop(message, serverQueue) {
 }
 
 function play(guild, song) {
+  console.log("Playing")
   const serverQueue = queue.get(guild.id);
   if (!song) {
+    console.log("Leaving voice channel - play")
     serverQueue.voiceChannel.leave();
     queue.delete(guild.id);
     return;
