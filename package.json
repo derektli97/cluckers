@@ -1,0 +1,27 @@
+{
+  "name": "quackers-package",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.2",
+    "discord.js": "^12.4.0",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "ytdl-core": "^3.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/derektli97/quackers.git"
+  },
+  "author": "Chef Tiramisu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/derektli97/quackers/issues"
+  },
+  "homepage": "https://github.com/derektli97/quackers#readme"
+}
