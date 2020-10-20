@@ -1,3 +1,5 @@
+// Originally named Quackers, now is known as cluckers
+
 const Discord = require("discord.js");
 const { prefix, token } = require("./config.json");
 const ytdl = require("ytdl-core");
@@ -19,14 +21,13 @@ client.once("disconnect", () => {
 });
 
 
-
-
 client.on("message", async message => {
   if (message.author.bot) return;
   if (!message.content.startsWith(prefix)) return;
 
   const serverQueue = queue.get(message.guild.id);
 
+  // message content input
   if (message.content.startsWith(`${prefix}play`)) {
     execute(message, serverQueue);
     return;
@@ -37,6 +38,14 @@ client.on("message", async message => {
     stop(message, serverQueue);
   } else if (message.content.startsWith(`${prefix}queue`)) {
     currentq(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}repeat`)) {
+    repeat(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}np`)) {
+    nowplaying(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}howdy`)) {
+    howdy(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}hookem`)) {
+    hookem(message, serverQueue);
     return;
   } else {
     message.channel.send("You need to enter a valid command!");
@@ -44,7 +53,8 @@ client.on("message", async message => {
 });
 
 
-// main execution code - where everything is running
+// ====================main execution code - where everything is running================================
+
 
 // Sending message in the channel
 // message.channel.send(`Welcome to Quackers, the fake Rythm Bot`);
@@ -102,17 +112,24 @@ async function execute(message, serverQueue) {
   }
 }
 
+//==================functions========================================================
 
+//------------------skip--------------------------------------------------
 function skip(message, serverQueue) {
   console.log("Skipping")
   if (!message.member.voice.channel)
     return message.channel.send(
-      "You have to be in a voice channel to stop the music!"
+      "You have to be in a voice channel to skip the music!"
     );
   if (!serverQueue)
     return message.channel.send("There is no song that I could skip!");
+  if (!serverQueue == 1){
+    return message.channel.send("Good bye!");
+  }
   serverQueue.connection.dispatcher.end();
 }
+
+//------------------stop--------------------------------------------------
 
 // Stop command just disconnects the bot
 function stop(message, serverQueue) {
@@ -124,6 +141,8 @@ function stop(message, serverQueue) {
   serverQueue.songs = [];
   serverQueue.connection.dispatcher.end();
 }
+
+//------------------play--------------------------------------------------
 
 function play(guild, song) {
   console.log("Playing")
@@ -140,36 +159,86 @@ function play(guild, song) {
       play(guild, serverQueue.songs[0]);
     })
     .on("error", error => console.error(error));
-  dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+  dispatcher.setVolumeLogarithmic(serverQueue.volume/5);
   serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
+//------------------repeat--------------------------------------------------
+
+function repeat(guild, song) {
+  console.log("Repeating current song")
+  const serverQueue = queue.get(guild.id);
+  if (!song) {
+    console.log(" (repeat) Leaving voice channel - play")
+    serverQueue.voiceChannel.leave();
+    queue.delete(guild.id);
+    return;
+  }
+
+  serverQueue.textChannel.send(`Start playing: **${song.title}**`);
+
+  while(!false){
+
+    const dispatcher = serverQueue.connection.play(ytdl(song.url, {quality: 'highestaudio', highWaterMark: 1 << 25})).on("finish", () => {
+      serverQueue.songs.shift();
+      play(guild, serverQueue.songs[0]);
+    })
+    .on("error", error => console.error(error));
+    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+  }
+
+}
+
+//------------------queue--------------------------------------------------
+
 function currentq(message, serverQueue) {
-  console.log("Current Queue")
+  console.log("Current Queue - " + serverQueue.songs.length)
   if (!message.member.voice.channel)
     return message.channel.send(
       "You have to be in a voice channel to check the current queue of the music!"
     );
   if (!serverQueue)
-    return message.channel.send("!serverQueue: " + String(serverQueue));
+    return message.channel.send("!server Queue: " + serverQueue.songs.length);
   
   if(serverQueue.songs.length == 1){
     return serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " song");
-  }
-  else{
-    return serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " songs");
+  }else{
+    return serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " songs. Next in queue" + serverQueue.songs.song.title);
   }
 }
 
-// function currentq(message, serverQueue) {
-//   console.log("Current Queue")
-//   if (!message.member.voice.channel)
-//     return message.channel.send(
-//       "You have to be in a voice channel to check the current queue of the music!"
-//     );
-//   if (!serverQueue)
-//     return message.channel.send("!serverQueue: " + String(serverQueue));
-//   serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " song");
-// }
+//------------------now playing--------------------------------------------------
+
+function nowplaying(message, serverQueue) {
+  console.log("Now playing - " + song.title)
+  if (!message.member.voice.channel)
+    return message.channel.send(
+      "You have to be in a voice channel to check the current queue of the music!"
+    );
+  if (!serverQueue)
+    return message.channel.send("No ServerQueue");
+
+  return serverQueue.textChannel.send(`Queue: **${song.title}**`);
+}
+
+
+
+//------------------howdy--------------------------------------------------
+
+function howdy(message, serverQueue) {
+  console.log("howdy test function")
+  return message.channel.send("Howdy to you too, my fellow good Ag! 🤠");
+}
+
+//------------------hookem--------------------------------------------------
+
+function hookem(message, serverQueue) {
+  console.log("hookem test function")
+  return message.channel.send("Hook 'em!");
+}
+
+
+//end of client
+
 
 client.login(token);
