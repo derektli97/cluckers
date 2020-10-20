@@ -7,16 +7,19 @@ const client = new Discord.Client();
 const queue = new Map();
 
 client.once("ready", () => {
-  console.log("Ready!");
+  console.log("Quackers Ready!");
 });
 
 client.once("reconnecting", () => {
-  console.log("Reconnecting!");
+  console.log("Quackers Reconnecting!");
 });
 
 client.once("disconnect", () => {
-  console.log("Disconnect!");
+  console.log("Quackers Disconnect!");
 });
+
+
+
 
 client.on("message", async message => {
   if (message.author.bot) return;
@@ -32,20 +35,31 @@ client.on("message", async message => {
     return;
   } else if (message.content.startsWith(`${prefix}stop`)) {
     stop(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}queue`)) {
+    currentq(message, serverQueue);
     return;
   } else {
     message.channel.send("You need to enter a valid command!");
   }
 });
 
+
+// main execution code - where everything is running
+
+// Sending message in the channel
+// message.channel.send(`Welcome to Quackers, the fake Rythm Bot`);
+
 async function execute(message, serverQueue) {
   const args = message.content.split(" ");
+  // message.channel.send(`Welcome to Quackers, the fake Rythm Bot`);
 
   const voiceChannel = message.member.voice.channel;
   if (!voiceChannel)
     return message.channel.send(
       "You need to be in a voice channel to play music!"
     );
+  
+  // Checking for permissions - needed to run in a channel
   const permissions = voiceChannel.permissionsFor(message.client.user);
   if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
     return message.channel.send(
@@ -55,8 +69,8 @@ async function execute(message, serverQueue) {
 
   const songInfo = await ytdl.getInfo(args[1]);
   const song = {
-    title: songInfo.title,
-    url: songInfo.video_url
+    title: songInfo.videoDetails.title,
+    url: songInfo.videoDetails.video_url
   };
 
   if (!serverQueue) {
@@ -88,6 +102,7 @@ async function execute(message, serverQueue) {
   }
 }
 
+
 function skip(message, serverQueue) {
   console.log("Skipping")
   if (!message.member.voice.channel)
@@ -98,7 +113,6 @@ function skip(message, serverQueue) {
     return message.channel.send("There is no song that I could skip!");
   serverQueue.connection.dispatcher.end();
 }
-
 
 // Stop command just disconnects the bot
 function stop(message, serverQueue) {
@@ -121,9 +135,7 @@ function play(guild, song) {
     return;
   }
 
-  const dispatcher = serverQueue.connection
-    .play(ytdl(song.url))
-    .on("finish", () => {
+  const dispatcher = serverQueue.connection.play(ytdl(song.url, {quality: 'highestaudio', highWaterMark: 1 << 25})).on("finish", () => {
       serverQueue.songs.shift();
       play(guild, serverQueue.songs[0]);
     })
@@ -131,5 +143,33 @@ function play(guild, song) {
   dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
   serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
+
+function currentq(message, serverQueue) {
+  console.log("Current Queue")
+  if (!message.member.voice.channel)
+    return message.channel.send(
+      "You have to be in a voice channel to check the current queue of the music!"
+    );
+  if (!serverQueue)
+    return message.channel.send("!serverQueue: " + String(serverQueue));
+  
+  if(serverQueue.songs.length == 1){
+    return serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " song");
+  }
+  else{
+    return serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " songs");
+  }
+}
+
+// function currentq(message, serverQueue) {
+//   console.log("Current Queue")
+//   if (!message.member.voice.channel)
+//     return message.channel.send(
+//       "You have to be in a voice channel to check the current queue of the music!"
+//     );
+//   if (!serverQueue)
+//     return message.channel.send("!serverQueue: " + String(serverQueue));
+//   serverQueue.textChannel.send("Queue: " + serverQueue.songs.length + " song");
+// }
 
 client.login(token);
