@@ -1,1 +1,2 @@
-# quackers
+# quackers - discord bot
+
