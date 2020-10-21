@@ -1,7 +1,7 @@
 {
   "name": "quackers-package",
   "version": "1.0.0",
-  "description": "",
+  "description": "somethingsomethingidk hehe",
   "main": "index.js",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
@@ -12,6 +12,7 @@
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
