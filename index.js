@@ -234,11 +234,21 @@ function howdy(message, serverQueue) {
 
 function hookem(message, serverQueue) {
   console.log("hookem test function")
-  return message.channel.send("Hook 'em!");
+  return message.channel.send(`Hook 'em! \m/`);
 }
+
+//------------------uwu feature - add faces----------------------------------
+
+//list of faces
+
+//------------------basic giveaway functionality-----------------------------
 
 
 //end of client
 
 
 client.login(token);
+
+
+
+//
