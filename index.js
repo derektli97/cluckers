@@ -46,6 +46,10 @@ client.on("message", async message => {
     howdy(message, serverQueue);
   } else if (message.content.startsWith(`${prefix}hookem`)) {
     hookem(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}uwu`)) {
+    uwufaces(message, serverQueue);
+  } else if (message.content.startsWith(`${prefix}cluck`)) {
+    uwufaces(message, serverQueue);
     return;
   } else {
     message.channel.send("You need to enter a valid command!");
@@ -130,7 +134,6 @@ function skip(message, serverQueue) {
 }
 
 //------------------stop--------------------------------------------------
-
 // Stop command just disconnects the bot
 function stop(message, serverQueue) {
   console.log("Stopping")
@@ -143,7 +146,6 @@ function stop(message, serverQueue) {
 }
 
 //------------------play--------------------------------------------------
-
 function play(guild, song) {
   console.log("Playing")
   const serverQueue = queue.get(guild.id);
@@ -164,7 +166,6 @@ function play(guild, song) {
 }
 
 //------------------repeat--------------------------------------------------
-
 function repeat(guild, song) {
   console.log("Repeating current song")
   const serverQueue = queue.get(guild.id);
@@ -238,6 +239,26 @@ function hookem(message, serverQueue) {
 }
 
 //------------------uwu feature - add faces----------------------------------
+
+function uwufaces(message, serverQueue){
+  console.log("entering faces");
+  var cars = ["(◕‿◕✿)", "(◠﹏◠✿)", "(◠‿◠✿)", "（＊＾Ｕ＾）人（≧Ｖ≦＊）/", "ôヮô", "∧( ‘Θ’ )∧", "(¤﹏¤)", "●‿●", "ʕ·ᴥ·ʔ", "＼（＾○＾）人（＾○＾）／","ヾ(＠⌒▽⌒＠)ﾉ"];
+  var random_int= Math.floor(Math.random()*100)+1;
+
+  while(random_int > cars.length){
+    console.log("uh oh" + String(random_int));
+    random_int = Math.floor(random_int/10);
+  }
+  console.log("reached here: " + random_int);
+
+  try{
+    return message.channel.send(cars[random_int]);
+  }catch(err){
+    return message.channel.send("Some issue happened?" + err)
+  }
+
+
+}
 
 //list of faces
 
